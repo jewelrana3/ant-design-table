@@ -1,5 +1,6 @@
 "use client";
-import { Table } from "antd";
+import { Spin, Table } from "antd";
+import { useEffect, useState } from "react";
 import { data } from "./api/data";
 
 const column = [
@@ -54,11 +55,20 @@ const column = [
   },
 ];
 
-const Home = () => (
-  <Table
-    columns={column}
-    dataSource={data}
-    pagination={{ pageSize: 6 }}
-  ></Table>
-);
+const Home = () => {
+  const [loading, setLoading] = useState(true); // Loading state to manage loading spinner
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }, []);
+
+  return (
+    <Spin spinning={loading} tip="Loading..." size="large">
+      <Table columns={column} dataSource={data} pagination={{ pageSize: 6 }} />
+    </Spin>
+  );
+};
+
 export default Home;
