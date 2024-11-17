@@ -1,74 +1,57 @@
 "use client";
-import { Spin, Table } from "antd";
-import { useEffect, useState } from "react";
+import { Table } from "antd";
+import { useState } from "react";
 import { data } from "./api/data";
 
-const column = [
-  {
-    title: "Name", // Group Title
-    children: [
-      {
-        title: "First Name",
-        dataIndex: "firstName",
-        key: "firstName",
-      },
-      {
-        title: "Last Name",
-        dataIndex: "lastName",
-        key: "lastName",
-      },
-    ],
-  },
-  {
-    title: "Last Name",
-    dataIndex: "lastName",
-    key: "lastName",
-  },
-  {
-    title: "Age",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Address",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Tags",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, record) => (
-      <>
-        {record.tags.map((tag, i) => (
-          <span className="bg-slate-300 mr-2" key={tag}>
-            {tag}
-          </span>
-        ))}
-      </>
-    ),
-    filters: [...new Set(data.flatMap((item) => item.tags))].map((tag) => ({
-      text: tag,
-      value: tag,
-    })),
-    onFilter: (value, record) => record.tags.includes(value),
-  },
-];
-
 const Home = () => {
-  const [loading, setLoading] = useState(true); // Loading state to manage loading spinner
+  const [filteredInfo, setFilteredInfo] = useState({});
+  const [sortedInfo, setSortedInfo] = useState({});
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
+  const handleChange = (pagination, filters, sorter) => {
+    setFilteredInfo(filters);
+    setSortedInfo(sorter);
+  };
 
+  const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+
+      filteredValue: filteredInfo.name || null,
+      onFilter: (value, record) => record.name.includes(value),
+      sorter: (a, b) => a.name.length - b.name.length,
+      sortOrder: sortedInfo.columnKey === "name" ? sortedInfo.order : null,
+      ellipsis: true,
+    },
+    {
+      title: "Age",
+      dataIndex: "age",
+      key: "age",
+      sorter: (a, b) => a.age - b.age,
+      sortOrder: sortedInfo.columnKey === "age" ? sortedInfo.order : null,
+      ellipsis: true,
+    },
+    {
+      title: "Address",
+      dataIndex: "address",
+      key: "address",
+      filteredValue: filteredInfo.address || null,
+      onFilter: (value, record) => record.address.includes(value),
+      sorter: (a, b) => a.address.length - b.address.length,
+      sortOrder: sortedInfo.columnKey === "address" ? sortedInfo.order : null,
+      ellipsis: true,
+    },
+  ];
   return (
-    <Spin spinning={loading} tip="Loading..." size="large">
-      <Table columns={column} dataSource={data} pagination={{ pageSize: 6 }} />
-    </Spin>
+    <>
+      <Table
+        columns={columns}
+        dataSource={data}
+        onChange={handleChange}
+        pagination={{ pageSize: 6 }}
+      />
+    </>
   );
 };
-
 export default Home;
